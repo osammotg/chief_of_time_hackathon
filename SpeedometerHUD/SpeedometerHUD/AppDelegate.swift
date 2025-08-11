@@ -15,13 +15,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         setupStatusBar()
         
-        // Check for debug flag
-        if CommandLine.arguments.contains("--debug") {
-            print("🔧 Debug mode enabled - showing debug window")
-            showDebugWindow()
-        } else {
-            setupFloatingPanel()
-        }
+        // Always show the "I AM VISIBLE" component by default
+        print("🔧 Showing I AM VISIBLE component by default")
+        showDebugWindow()
         
         setupGlobalHotkey()
         print("✅ App launch complete")
