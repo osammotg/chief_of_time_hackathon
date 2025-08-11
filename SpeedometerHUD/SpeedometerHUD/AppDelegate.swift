@@ -15,9 +15,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         setupStatusBar()
         
-        // Always show the "I AM VISIBLE" component by default
-        print("🔧 Showing I AM VISIBLE component by default")
+        // Always show both components for testing
+        print("🔧 Showing both I AM VISIBLE and Task 2 FloatingPanel")
         showDebugWindow()
+        setupFloatingPanel()
         
         setupGlobalHotkey()
         print("✅ App launch complete")
@@ -201,8 +202,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         print("✅ SwiftUI content configured")
         
-        // Show the panel
-        floatingPanel?.makeKeyAndOrderFront(nil)
+        // Show the panel and ensure it stays visible
+        floatingPanel?.orderFrontRegardless()
         print("✅ Panel should now be visible")
         
         // Debug: check if panel is actually visible
@@ -218,6 +219,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func toggleHUD() {
         print("🖱️ Toggle HUD clicked!")
         
+        // Handle debug window if it exists
         if let debugWindow = debugWindow {
             print("🔧 Toggling debug window...")
             print("🔍 Debug window isVisible before toggle: \(debugWindow.isVisible)")
@@ -232,7 +234,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             print("🔍 Debug window isVisible after toggle: \(debugWindow.isVisible)")
-        } else if let panel = floatingPanel {
+        }
+        
+        // Handle floating panel if it exists
+        if let panel = floatingPanel {
             print("🔍 Panel isVisible before toggle: \(panel.isVisible)")
             
             if panel.isVisible {
@@ -240,7 +245,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 panel.orderOut(nil)
             } else {
                 print("👁️ Showing panel...")
-                panel.makeKeyAndOrderFront(nil)
+                panel.orderFrontRegardless()
             }
             
             print("🔍 Panel isVisible after toggle: \(panel.isVisible)")

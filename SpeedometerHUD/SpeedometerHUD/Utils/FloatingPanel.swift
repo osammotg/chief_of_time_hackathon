@@ -39,8 +39,8 @@ class FloatingPanel: NSPanel {
     }
     
     private func configurePanel() {
-        // Set window level for always-on-top behavior
-        level = .screenSaver // Use screen saver level for maximum visibility
+        // Set window level for always-on-top behavior (use floating instead of screenSaver)
+        level = .floating // Better for multi-screen and focus management
         print("🔍 Set window level to: \(level.rawValue)")
         
         // Configure collection behavior for all Spaces and full-screen
@@ -76,11 +76,11 @@ class FloatingPanel: NSPanel {
     
     private func configureCollectionBehavior() {
         // Set collection behavior for all Spaces and full-screen
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         
-        // Additional behaviors for better Space management
-        collectionBehavior.insert(.stationary) // Keeps panel in place during Space transitions
-        collectionBehavior.insert(.ignoresCycle) // Prevents panel from being cycled through with Tab key
+        // Additional behaviors for better multi-screen support
+        collectionBehavior.insert(.fullScreenDisallowsTiling) // Prevents tiling issues
+        collectionBehavior.insert(.managed) // Better window management
     }
     
     private func configureVisualEffects() {
@@ -119,15 +119,33 @@ class FloatingPanel: NSPanel {
         return false
     }
     
+    // Override to prevent the panel from being hidden when losing focus
+    override func resignKey() {
+        super.resignKey()
+        // Keep the panel visible even when losing focus
+        if isVisible {
+            orderFrontRegardless()
+        }
+    }
+    
+    // Override to ensure panel stays visible
+    override func orderOut(_ sender: Any?) {
+        // Only allow hiding through explicit calls, not automatic focus loss
+        super.orderOut(sender)
+    }
+    
     // Method to ensure proper window level and behavior
     func ensureAlwaysOnTop() {
-        // Set to screen saver level for maximum visibility
-        if level != .screenSaver {
-            level = .screenSaver
+        // Set to floating level for better multi-screen support
+        if level != .floating {
+            level = .floating
         }
         
         // Ensure collection behavior is correct
         configureCollectionBehavior()
+        
+        // Force the panel to be visible on all screens
+        orderFrontRegardless()
     }
     
     private func setupSpaceChangeNotifications() {
@@ -152,6 +170,7 @@ class FloatingPanel: NSPanel {
         // Ensure panel remains visible after Space change
         DispatchQueue.main.async { [weak self] in
             self?.ensureAlwaysOnTop()
+            self?.orderFrontRegardless()
         }
     }
     
@@ -159,6 +178,7 @@ class FloatingPanel: NSPanel {
         // Handle display changes (e.g., external monitor connected/disconnected)
         DispatchQueue.main.async { [weak self] in
             self?.ensureAlwaysOnTop()
+            self?.orderFrontRegardless()
         }
     }
     
