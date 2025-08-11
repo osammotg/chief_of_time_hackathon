@@ -2,20 +2,11 @@ import SwiftUI
 
 @main
 struct SpeedometerHUDApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        Settings {
+            EmptyView()
         }
     }
-}
-
-struct ContentView: View {
-    var body: some View {
-        Text("SpeedometerHUD")
-            .padding()
-    }
-}
-
-#Preview {
-    ContentView()
 } 

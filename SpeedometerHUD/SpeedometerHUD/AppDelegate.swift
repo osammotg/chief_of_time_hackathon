@@ -20,8 +20,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         showDebugWindow()
         overlayController.show()
         
-        setupGlobalHotkey()
-        
         // Register global hotkey for HUD toggle
         GlobalHotKey.register(key: "h", modifiers: [.command, .option]) { [weak self] in
             self?.toggleHUD()
@@ -123,22 +121,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // MARK: - Global Hotkey
     
-    private func setupGlobalHotkey() {
-        print("⌨️ Setting up global hotkey (⌘⇧R)...")
-        
-        NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            // Check for ⌘⇧R (Command+Shift+R)
-            if event.modifierFlags.contains([.command, .shift]) && event.keyCode == 15 { // R key
-                print("⌨️ Global hotkey pressed (⌘⇧R)")
-                DispatchQueue.main.async {
-                    self?.forceShow()
-                }
-            }
-        }
-        
-        print("✅ Global hotkey configured")
-    }
-    
     @objc private func forceShow() {
         print("🔧 Force showing window...")
         
@@ -195,6 +177,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     private func cleanup() {
         print("🧹 Cleaning up...")
+        
+        // Clean up global hotkeys
+        GlobalHotKey.cleanup()
+        print("✅ Global hotkeys cleaned up")
         
         // Clean up status bar item
         if let statusItem = statusItem {
