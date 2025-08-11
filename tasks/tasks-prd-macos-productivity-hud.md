@@ -27,19 +27,19 @@
 - [ ] 1.0 Project Setup and Core Architecture
   - [x] 1.1 Create Xcode project with SwiftUI app template targeting macOS 13+
   - [x] 1.2 Set up project structure with proper file organization
-  - [ ] 1.3 Configure app bundle identifier and deployment target
-  - [ ] 1.5 Create basic app entry point with AppKit bridge setup
-  - [ ] 1.6 Configure app to hide from Dock and run as menu bar utility
+  - [x] 1.3 Configure app bundle identifier and deployment target
+  - [x] 1.5 Create basic app entry point with AppKit bridge setup
+  - [x] 1.6 Configure app to hide from Dock and run as menu bar utility
 
 - [ ] 2.0 Window Management and Display System
-  - [ ] 2.1 Create FloatingPanel subclass extending NSPanel
-  - [ ] 2.2 Configure panel properties: borderless, transparent, rounded corners
-  - [ ] 2.3 Set window level to .floating with fullScreenAuxiliary behavior
-  - [ ] 2.4 Implement canJoinAllSpaces and fullScreenAuxiliary collection behaviors
+  - [x] 2.1 Create FloatingPanel subclass extending NSPanel
+  - [x] 2.2 Configure panel properties: borderless, transparent, rounded corners
+  - [x] 2.3 Set window level to .floating with fullScreenAuxiliary behavior
+  - [x] 2.4 Implement canJoinAllSpaces and fullScreenAuxiliary collection behaviors
   - [ ] 2.5 Add NSVisualEffectView with blur effects for glass morphism
-  - [ ] 2.6 Implement drag functionality with mouse event handling
-  - [ ] 2.7 Add edge snapping behavior (snap when <10px from edges)
-  - [ ] 2.10 Implement window positioning logic (top-right with 16px margins)
+  - [x] 2.6 Implement drag functionality with mouse event handling
+  - [x] 2.7 Add edge snapping behavior (snap when <10px from edges)
+  - [x] 2.10 Implement window positioning logic (top-right with 16px margins)
 
 - [ ] 3.0 Core UI Components and Visual Design
   - [ ] 3.1 Create HUDView as main SwiftUI content view
