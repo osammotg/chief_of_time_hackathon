@@ -3,7 +3,7 @@ import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
-    var floatingPanel: FloatingPanel?
+    var overlayController = OverlayWindowController()
     var debugWindow: NSWindow? // Add debug window reference
     
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -16,11 +16,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupStatusBar()
         
         // Always show both components for testing
-        print("🔧 Showing both I AM VISIBLE and Task 2 FloatingPanel")
+        print("🔧 Showing both I AM VISIBLE and persistent overlay window")
         showDebugWindow()
-        setupFloatingPanel()
+        overlayController.show()
         
         setupGlobalHotkey()
+        
+        // Register global hotkey for HUD toggle
+        GlobalHotKey.register(key: "h", modifiers: [.command, .option]) { [weak self] in
+            self?.toggleHUD()
+        }
+        
         print("✅ App launch complete")
     }
     
@@ -141,12 +147,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             debugWindow.orderFrontRegardless()
             NSApp.activate(ignoringOtherApps: false)
             print("✅ Debug window force shown")
-        } else if let panel = floatingPanel {
-            panel.makeKeyAndOrderFront(nil)
-            panel.orderFrontRegardless()
-            NSApp.activate(ignoringOtherApps: false)
-            print("✅ Panel force shown")
         }
+        
+        overlayController.show()
+        print("✅ Overlay window force shown")
     }
     
     private func setupStatusBar() {
@@ -163,58 +167,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    private func setupFloatingPanel() {
-        print("🪟 Setting up floating panel...")
-        
-        // Create the floating panel with default size
-        let panelRect = NSRect(x: 0, y: 0, width: 260, height: 140)
-        floatingPanel = FloatingPanel(contentRect: panelRect, styleMask: [.borderless], backing: .buffered, defer: false)
-        
-        // Force the panel to use its default positioning
-        floatingPanel?.setDefaultPosition()
-        
-        // Ensure window level is set correctly
-        floatingPanel?.ensureAlwaysOnTop()
-        
-        print("✅ Floating panel created")
-        
-        // Create and set the SwiftUI content view
-        let hudView = HUDView()
-        let hostingView = NSHostingView(rootView: hudView)
-        
-        // Get the visual effect view from the panel and add the hosting view to it
-        if let visualEffectView = floatingPanel?.contentView as? NSVisualEffectView {
-            visualEffectView.addSubview(hostingView)
-            print("✅ Added SwiftUI content to visual effect view")
-        } else {
-            // Fallback: add to content view directly
-            floatingPanel?.contentView?.addSubview(hostingView)
-            print("⚠️ Added SwiftUI content to content view (fallback)")
-        }
-        
-        // Configure the hosting view to fill the panel
-        hostingView.frame = panelRect
-        hostingView.autoresizingMask = [.width, .height]
-        
-        // Make sure the hosting view is on top
-        hostingView.wantsLayer = true
-        hostingView.layer?.backgroundColor = NSColor.clear.cgColor
-        
-        print("✅ SwiftUI content configured")
-        
-        // Show the panel and ensure it stays visible
-        floatingPanel?.orderFrontRegardless()
-        print("✅ Panel should now be visible")
-        
-        // Debug: check if panel is actually visible
-        if let panel = floatingPanel {
-            print("🔍 Panel isVisible: \(panel.isVisible)")
-            print("🔍 Panel frame: \(panel.frame)")
-            print("🔍 Panel level: \(panel.level.rawValue)")
-            print("🔍 Panel contentView: \(String(describing: panel.contentView))")
-            print("🔍 Hosting view frame: \(hostingView.frame)")
-        }
-    }
+    // setupFloatingPanel method removed - replaced with OverlayWindowController
     
     @objc private func toggleHUD() {
         print("🖱️ Toggle HUD clicked!")
@@ -236,25 +189,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("🔍 Debug window isVisible after toggle: \(debugWindow.isVisible)")
         }
         
-        // Handle floating panel if it exists
-        if let panel = floatingPanel {
-            print("🔍 Panel isVisible before toggle: \(panel.isVisible)")
-            
-            if panel.isVisible {
-                print("👁️ Hiding panel...")
-                panel.orderOut(nil)
-            } else {
-                print("👁️ Showing panel...")
-                panel.orderFrontRegardless()
-            }
-            
-            print("🔍 Panel isVisible after toggle: \(panel.isVisible)")
-        }
+        // Handle overlay window
+        overlayController.toggle()
     }
     
     private func cleanup() {
+        print("🧹 Cleaning up...")
+        
+        // Clean up status bar item
+        if let statusItem = statusItem {
+            NSStatusBar.system.removeStatusItem(statusItem)
+            print("✅ Status bar item removed")
+        }
+        
+        // Clean up debug window
         debugWindow?.close()
-        floatingPanel?.close()
-        statusItem = nil
+        print("✅ Debug window closed")
+        
+        // Clean up overlay window
+        overlayController.hide()
+        print("✅ Overlay window closed")
+        
+        print("✅ Cleanup complete")
     }
 } 
