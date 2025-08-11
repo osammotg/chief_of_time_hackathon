@@ -424,4 +424,45 @@ class FloatingPanel: NSPanel {
         
         return (relativeX, relativeY)
     }
+    
+    // MARK: - Panel Sizing Helpers
+    
+    // Expand upward to ~70% height / ~30% width from current bottom edge
+    func expandToDayPanel() {
+        print("🔍 before expand:", frame)
+        guard let scr = self.screen ?? NSScreen.screens.first(where: { $0.frame.intersects(self.frame) }) else { return }
+        let vis = scr.visibleFrame
+
+        let targetW = max(320, min(vis.width * 0.30, vis.width * 0.40))  // 30% default (20–30% was the goal)
+        let targetH = max(420, min(vis.height * 0.70, vis.height * 0.90)) // ~70% of height
+
+        let anchorRight = abs(frame.maxX - vis.maxX) < abs(frame.minX - vis.minX)
+        setSizeKeepingBottomAnchor(newWidth: targetW, newHeight: targetH, anchorRight: anchorRight)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { 
+            print("🔍 after expand:", self.frame) 
+        }
+    }
+    
+    // Collapse back to compact size
+    func collapseToCompact() {
+        print("🔍 before collapse:", frame)
+        let compactWidth: CGFloat = 260.0
+        let compactHeight: CGFloat = 140.0
+        
+        setSizeKeepingBottomAnchor(newWidth: compactWidth, newHeight: compactHeight, anchorRight: false)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { 
+            print("🔍 after collapse:", self.frame) 
+        }
+    }
+    
+    // General helper to set size while keeping bottom-left/right anchor
+    func setSizeKeepingBottomAnchor(newWidth: CGFloat, newHeight: CGFloat, anchorRight: Bool) {
+        let f = frame
+        let newY = f.origin.y // keep bottom fixed
+        let newX = anchorRight ? (f.maxX - newWidth) : f.origin.x
+        let newFrame = NSRect(x: newX, y: newY, width: newWidth, height: newHeight)
+        setFrame(newFrame, display: true, animate: true)
+    }
 } 

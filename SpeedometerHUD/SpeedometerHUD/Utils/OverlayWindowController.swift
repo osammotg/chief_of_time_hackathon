@@ -14,26 +14,22 @@ final class OverlayWindowController: NSWindowController {
             height: Self.defaultSize.height
         )
         
-        let w = NSWindow(contentRect: windowRect,
-                         styleMask: [.borderless],
-                         backing: .buffered,
-                         defer: false)
-        
-        // Configure for persistent overlay behavior
-        w.isOpaque = false
-        w.backgroundColor = .clear
-        w.level = .floating // App Store safe, above normal windows
-        w.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
-        w.isMovableByWindowBackground = true
-        w.hasShadow = true
-        w.hidesOnDeactivate = false
-        w.isReleasedWhenClosed = false
-        w.styleMask.insert(.nonactivatingPanel)
+        // Use FloatingPanel instead of NSWindow
+        let w = FloatingPanel(contentRect: windowRect,
+                             styleMask: [.borderless],
+                             backing: .buffered,
+                             defer: false)
         
         super.init(window: w)
         
-        // Set up SwiftUI HUD content
-        let hosting = NSHostingController(rootView: HUDView())
+        // Set up SwiftUI HUD content with expand/collapse callback
+        let hosting = NSHostingController(rootView: HUDView { isExpanded in
+            if isExpanded {
+                self.expandToDayPanel()
+            } else {
+                self.collapseToCompact()
+            }
+        })
         self.contentViewController = hosting
         
         // Persist window position
@@ -65,5 +61,17 @@ final class OverlayWindowController: NSWindowController {
     func hide() {
         window?.orderOut(nil)
         print("👁️ Hiding overlay window")
+    }
+    
+    // MARK: - Panel Sizing Helpers
+    
+    func expandToDayPanel() {
+        guard let floatingPanel = window as? FloatingPanel else { return }
+        floatingPanel.expandToDayPanel()
+    }
+    
+    func collapseToCompact() {
+        guard let floatingPanel = window as? FloatingPanel else { return }
+        floatingPanel.collapseToCompact()
     }
 } 
